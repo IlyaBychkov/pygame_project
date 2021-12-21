@@ -1,6 +1,6 @@
 class Menu:
     def __init__(self):
-        pass
+        print(1)
 
     def start_game(self):
         pass

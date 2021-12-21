@@ -12,8 +12,7 @@ def terminate():
 
 
 def load_image(name, colorkey=None):
-    fullname = os.path.join(os.pardir, 'img', name)
-    # если файл не существует, то выходим
+    fullname = os.path.join('../img', name)
     if not os.path.isfile(fullname):
         print(f"Файл с изображением '{fullname}' не найден")
         sys.exit()
