@@ -1,9 +1,6 @@
-class Chess:
-    def __init__(self):
-        pass
+import pygame, start
 
-    def start(self):
-        pass
-
-    def exit(self):
-        pass
+if __name__ == '__main__':
+    pygame.init()
+    size = weight, height = 500, 500
+    screen = start.Chess()
