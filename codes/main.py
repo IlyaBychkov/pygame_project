@@ -33,7 +33,8 @@ def load_image(name, colorkey=None):
 
 if __name__ == '__main__':
     pygame.init()
-    image = load_image('fon.png')
+    clock = pygame.time.Clock()
+    image = load_image('start_fon.png')
     size = width, height = image.get_width() // 2, image.get_height() // 2
     screen = pygame.display.set_mode(size)
-    chess = start.Chess(screen, size)
+    chess = start.Chess(screen, clock)

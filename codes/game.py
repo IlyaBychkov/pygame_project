@@ -1,15 +1,16 @@
 import pygame
 
 import chesses
-from main import fps, load_image
+from main import fps, load_image, terminate
 
 
 class Game:
-    def __init__(self, screen, size):
+    def __init__(self, screen, clock):
         self.board = chesses.Board(8, 8, 100, 100, 50, 3)
         self.board.width_frame = 3
         self.screen = screen
-        self.size = self.width, self.height = size
+        self.size = self.width, self.height = screen.get_width(), screen.get_height()
+        self.clock = clock
         self.x = self.y = -1
         self.images = {
             'bB': load_image('kit_figures1/bishop_black.png'),
@@ -25,8 +26,7 @@ class Game:
             'bR': load_image('kit_figures1/rook_black.png'),
             'wR': load_image('kit_figures1/rook_white.png')
         }
-        pygame.display.set_caption("Добро пожаловать в игру")
-        self.clock = pygame.time.Clock()
+        pygame.display.set_caption("Шахматы")
         self.main()
 
     def main(self):
@@ -34,7 +34,8 @@ class Game:
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    running = False
+                    terminate()
+                    return
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     self.get_click(event.pos)
             self.screen.fill((0, 0, 0))
