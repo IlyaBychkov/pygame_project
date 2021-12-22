@@ -230,7 +230,13 @@ def correct_coords(row, col):
 
 
 class Board:
-    def __init__(self):
+    def __init__(self, width=8, height=8, left=10, top=10, cell_size=10, width_frame=2):
+        self.width = width
+        self.height = height
+        self.left = left
+        self.top = top
+        self.cell_size = cell_size
+        self.width_frame = width_frame
         self.color = WHITE
         self.field = []
         for row in range(8):
