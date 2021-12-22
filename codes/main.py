@@ -6,6 +6,9 @@ import pygame
 import start
 
 
+fps = 60
+
+
 def terminate():
     pygame.quit()
     sys.exit()
@@ -30,5 +33,7 @@ def load_image(name, colorkey=None):
 
 if __name__ == '__main__':
     pygame.init()
-    size = weight, height = 500, 500
-    screen = start.Chess()
+    image = load_image('fon.png')
+    size = width, height = image.get_width() // 2, image.get_height() // 2
+    screen = pygame.display.set_mode(size)
+    chess = start.Chess(screen, size)
