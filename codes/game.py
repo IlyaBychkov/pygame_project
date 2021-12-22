@@ -26,7 +26,7 @@ class Game:
             'bR': load_image('kit_figures1/rook_black.png'),
             'wR': load_image('kit_figures1/rook_white.png')
         }
-        pygame.display.set_caption("Добро пожаловать в игру")
+        pygame.display.set_caption("Шахматы")
         self.all_sprites = pygame.sprite.Group()
         for i in range(self.board.width):
             for j in range(self.board.height):
