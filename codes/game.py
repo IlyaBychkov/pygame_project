@@ -26,6 +26,24 @@ class Game:
             'wR': load_image('kit_figures1/rook_white.png')
         }
         pygame.display.set_caption("Добро пожаловать в игру")
+        self.all_sprites = pygame.sprite.Group()
+        for i in range(self.board.width):
+            for j in range(self.board.height):
+                if self.board.cell(i, j) != '  ':
+                    self.board.field[i][j].sprite = pygame.sprite.Sprite(self.all_sprites)
+                    img = self.images[self.board.cell(i, j)]
+                    koeff = (self.board.cell_size - 5) / img.get_height()
+                    self.board.field[i][j].sprite.image = pygame.transform.scale(
+                        self.images[self.board.cell(i, j)], (
+                            img.get_width() * koeff, img.get_height() * koeff))
+
+                    self.board.field[i][j].sprite.rect = self.board.field[i][
+                        j].sprite.image.get_rect()
+
+                    self.board.field[i][j].sprite.rect.center = self.board.left + int(
+                        self.board.cell_size * (j + 0.5)), self.board.left + int(
+                                                                    self.board.cell_size * (
+                                                                                7 - i + 0.5))
         self.clock = pygame.time.Clock()
         self.main()
 
@@ -41,7 +59,7 @@ class Game:
             self.render()
             self.all_sprites.draw(self.screen)
             pygame.display.flip()
-            self.clock.tick(fps)
+            # self.clock.tick(fps)
 
     def render(self):
         pygame.draw.rect(self.screen, 'white',
@@ -49,36 +67,29 @@ class Game:
                           self.board.top - self.board.width_frame,
                           self.board.cell_size * self.board.width + self.board.width_frame * 2,
                           self.board.cell_size * self.board.height + self.board.width_frame * 2])
-        colors = [(255, 165, 0), (165, 42, 42)]
+        colors = [(240, 218, 181), (181, 131, 99), (242, 130, 116), (212, 89, 74), (245, 236, 115), (216, 194, 74)]
         for i in range(self.board.width):
             for j in range(self.board.height):
                 x = 7 - i
                 y = j
                 r, g, b = colors[(i + j) % 2]
                 if (x == self.x and y == self.y) or self.board.field[self.x][self.y].can_move(
-                            self.board, self.x, self.y, x, y) and not self.board.field[x][y]:
-                    r = b = 0
+                        self.board, self.x, self.y, x, y) and not self.board.field[x][y]:
+                    if (i + j) % 2:
+                        r, g, b = colors[5]
+                    else:
+                        r, g, b = colors[4]
                 elif (x != self.x or y != self.y) and self.board.field[self.x][self.y].can_attack(
-                            self.board, self.x, self.y, x, y) and self.board.field[x][y] and \
-                            self.board.field[x][y].color != self.board.field[self.x][self.y].color:
-                    g = b = 0
-                    r = 150
+                        self.board, self.x, self.y, x, y) and self.board.field[x][y] and \
+                        self.board.field[x][y].color != self.board.field[self.x][self.y].color:
+                    if (i + j) % 2:
+                        r, g, b = colors[3]
+                    else:
+                        r, g, b = colors[2]
                 pygame.draw.rect(self.screen, (r, g, b),
                                  [self.board.left + self.board.cell_size * j,
                                   self.board.top + self.board.cell_size * i,
                                   self.board.cell_size, self.board.cell_size])
-        self.all_sprites = pygame.sprite.Group()
-        for i in range(self.board.width):
-            for j in range(self.board.height):
-                if self.board.cell(i, j) != '  ':
-                    figure = pygame.sprite.Sprite(self.all_sprites)
-                    img = self.images[self.board.cell(i, j)]
-                    koeff = (self.board.cell_size - 5) / img.get_height()
-                    figure.image = pygame.transform.scale(self.images[self.board.cell(i, j)], (
-                        img.get_width() * koeff, img.get_height() * koeff))
-                    figure.rect = figure.image.get_rect()
-                    figure.rect.center = self.board.left + int(self.board.cell_size * (j + 0.5)), \
-                                         self.board.left + int(self.board.cell_size * (7 - i + 0.5))
 
     def get_cell(self, mouse_pos):
         cell_x = (mouse_pos[0] - self.board.left) // self.board.cell_size
@@ -87,31 +98,24 @@ class Game:
             return None
         return cell_x, 7 - cell_y
 
+    def get_coords(self, x, y):
+        return (self.board.left + int(self.board.cell_size * (y + 0.5)), self.board.left + int(
+            self.board.cell_size * (7 - x + 0.5)))
+
     def on_click(self, cell):
-        if self.board.cell(cell[1], cell[0]) != '  ':
+        y, x = cell
+        if self.x != -1:
+            # print(self.get_coords(x, y))
+            self.board.field[self.x][self.y].sprite.rect.center = self.get_coords(x, y)
+            pygame.sprite.spritecollide(self.board.field[self.x][self.y].sprite, self.all_sprites, True)
+            self.all_sprites.add(self.board.field[self.x][self.y].sprite)
+            self.board.field[x][y] = self.board.field[self.x][self.y]
+            self.board.field[self.x][self.y] = None
+            self.x = self.y = -1
+        elif self.board.cell(cell[1], cell[0]) != '  ':
             self.y, self.x = cell
         else:
             self.x = self.y = -1
-        print(self.x, self.y)
-        return
-        # cell = cell[0], 7 - cell[1]
-        print(self.x, self.y, *cell)
-        if (self.x != -1) and (cell[0] != self.x or cell[1] != self.y) and \
-                ((self.board.field[self.y][self.x].can_move(self.board, self.y, self.x, cell[1], cell[0]) and
-              not self.board.field[cell[1]][cell[0]]) or (self.board.field[self.y][self.x].can_attack(
-            self.board, self.y, self.x, cell[1], cell[0]) and
-                self.board.field[cell[1]][cell[0]] and
-                self.board.field[cell[1]][cell[0]].color != self.board.field[self.y][self.x].color)):
-            self.board.move_piece(self.y, self.x, cell[1], cell[0])
-            self.x = self.y = -1
-            return
-        cell = cell[0], 7 - cell[1]
-        if self.board.cell(cell[1], cell[0]) != '  ':
-            self.x, self.y = cell[0], 7 - cell[1]
-        else:
-            self.x = self.y = -1
-        # print(self.x, self.y, *cell)
-
 
     def get_click(self, mouse_pos):
         cell = self.get_cell(mouse_pos)
