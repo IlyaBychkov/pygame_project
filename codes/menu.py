@@ -1,38 +1,9 @@
 import pygame
 
 import game
+import rating
 import start
-from main import load_image, fps, terminate
-
-
-class Button(pygame.sprite.Sprite):
-    def __init__(self, text, x, y, width, height, menu, *groups):
-        super().__init__(*groups)
-        self.text = text
-        self.menu_window = menu
-        self.pos = [x, y, width, height]
-        self.rect = pygame.rect.Rect(*self.pos)
-        self.font = pygame.font.Font(None, 42)
-
-    def render(self, screen):
-        pygame.draw.rect(screen, (255, 255, 255), self.rect)
-        string_rendered = self.font.render(self.text, True, pygame.Color('black'))
-        screen.blit(string_rendered, self.rect)
-
-    def check_click(self, coords):
-        return self.pos[0] <= coords[0] <= self.pos[0] + self.pos[2] and \
-               self.pos[1] <= coords[1] <= self.pos[1] + self.pos[3]
-
-    def swap_window(self):
-        if self.text == 'Назад':
-            return 0
-        elif self.text == 'Играть':
-            return 1
-
-    def get_click(self, mouse_pos):
-        if self.check_click(mouse_pos):
-            return self.swap_window()
-        return -1
+from main import load_image, fps, terminate, Button
 
 
 class Menu:
@@ -48,11 +19,12 @@ class Menu:
         self.buttons = pygame.sprite.Group()
         Button('Назад', 20, 20, 100, 30, self, self.all_sprites, self.buttons)
         Button('Играть', self.width - 20 - 100, 20, 100, 30, self, self.all_sprites, self.buttons)
+        Button('Рейтинг', 20, 100, 150, 30, self, self.all_sprites, self.buttons)
 
         self.main()
 
     def main(self):
-        next = -1
+        next = None
         running = True
         while running:
             for event in pygame.event.get():
@@ -61,7 +33,7 @@ class Menu:
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     for btn in self.buttons:
                         new = btn.get_click(event.pos)
-                        if new != -1:
+                        if new:
                             next = new
                             running = False
             self.screen.blit(self.fon, (0, 0))
@@ -69,10 +41,12 @@ class Menu:
                 btn.render(self.screen)
             pygame.display.flip()
             self.clock.tick(fps)
-        if next == 0:
+        if next == 'Назад':
             self.back()
-        elif next == 1:
+        elif next == 'Играть':
             self.start_game()
+        elif next == 'Рейтинг':
+            self.rating()
         else:
             terminate()
 
@@ -86,7 +60,7 @@ class Menu:
         pass
 
     def rating(self):
-        pass
+        rating_window = rating.Rating(self.screen, self.clock)
 
     def back(self):
         start_window = start.Chess(self.screen, self.clock)

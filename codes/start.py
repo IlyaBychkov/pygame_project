@@ -1,7 +1,8 @@
 import pygame
 
-import menu
 from main import fps, load_image, terminate
+
+import menu
 
 
 class Chess:

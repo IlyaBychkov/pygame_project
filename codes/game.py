@@ -1,7 +1,9 @@
 import pygame
 
-import chesses
 from main import fps, load_image, terminate
+
+import chesses
+import finish
 
 
 class Game:
@@ -56,12 +58,14 @@ class Game:
                     terminate()
                     return
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    self.get_click(event.pos)
+                    if not self.get_click(event.pos):
+                        running = False
             self.screen.fill((0, 0, 0))
             self.render()
             self.all_sprites.draw(self.screen)
             pygame.display.flip()
             self.clock.tick(fps)
+        self.finish()
 
     def render(self):
         pygame.draw.rect(self.screen, 'white',
@@ -123,6 +127,7 @@ class Game:
         cell = self.get_cell(mouse_pos)
         if cell:
             self.on_click(cell)
+        return cell
 
     def opponent(self):
         pass
@@ -131,4 +136,4 @@ class Game:
         pass
 
     def finish(self):
-        pass
+        finish_window = finish.Finish(self.screen, self.clock, self.board.current_player_color())
