@@ -31,23 +31,9 @@ def main():
     # Создаём шахматную доску
     board = Board()
     # Цикл ввода команд игроков
-    print_board(board)
+    # print_board(board)
     while True:
         NUM += 1
-        # Выводим положение фигур на доске
-        # Подсказка по командам
-        print('Команды:')
-        print('    exit                               -- Выход')
-        print('    move <row> <col> <row1> <row1>     -- Ход из клетки (row, col)')
-        print('                                          в клетку (row1, col1)')
-        print('    help letters                       -- Описание сокращений')
-        print('    help <figure>                      -- Описание фигуры (figure), ', end='')
-        print('Rook - Ладья, Bishop - Слон')
-        print('                                          Knight - Конь, Queen - Ферзь, ', end='')
-        print('King - Король, Pawn - Пешка')
-        print('    board                              -- Вывести доску')
-        print('    leave                              -- Сдаться')
-        # Выводим приглашение игроку нужного цвета
         if board.current_player_color() == WHITE:
             print('Ход белых:')
         else:
@@ -123,6 +109,7 @@ class Board:
         self.cell_size = cell_size
         self.width_frame = width_frame
         self.color = WHITE
+        self.num = 0
         self.field = []
         for row in range(8):
             self.field.append([None] * 8)
@@ -310,7 +297,7 @@ class Pawn:
             if (self.can_attack(board, row, col, row1, col1) and
                     type(board.field[row1 - direction][col1]) is Pawn and
                     board.field[row1 - direction][col1].color != self.color and
-                    board.field[row1 - direction][col1].flag == NUM - 1):
+                    board.field[row1 - direction][col1].flag == board.num - 1):
                 board.field[row1 - direction][col1] = None
                 return True
             return False
@@ -332,7 +319,7 @@ class Pawn:
         if (row == start_row
                 and row + 2 * direction == row1
                 and board.field[row + direction][col] is None):
-            self.flag = NUM
+            self.flag = board.num
             return True
 
         return False

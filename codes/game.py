@@ -1,6 +1,7 @@
 import pygame
 
 from main import fps, load_image, terminate
+from chesses import BLACK, WHITE, check_mat
 
 import chesses
 import finish
@@ -47,7 +48,7 @@ class Game:
                         self.board.cell_size * (j + 0.5)), self.board.left + int(
                                                                     self.board.cell_size * (
                                                                                 7 - i + 0.5))
-        self.clock = pygame.time.Clock()
+        self.NUM = 1
         self.main()
 
     def main(self):
@@ -96,6 +97,10 @@ class Game:
                                  [self.board.left + self.board.cell_size * j,
                                   self.board.top + self.board.cell_size * i,
                                   self.board.cell_size, self.board.cell_size])
+        if self.board.current_player_color() == WHITE:
+            print('Ход белых:')
+        else:
+            print('Ход чёрных:')
 
     def get_cell(self, mouse_pos):
         cell_x = (mouse_pos[0] - self.board.left) // self.board.cell_size
@@ -111,12 +116,14 @@ class Game:
     def on_click(self, cell):
         y, x = cell
         if self.x != -1:
-            # print(self.get_coords(x, y))
-            self.board.field[self.x][self.y].sprite.rect.center = self.get_coords(x, y)
-            pygame.sprite.spritecollide(self.board.field[self.x][self.y].sprite, self.all_sprites, True)
-            self.all_sprites.add(self.board.field[self.x][self.y].sprite)
-            self.board.field[x][y] = self.board.field[self.x][self.y]
-            self.board.field[self.x][self.y] = None
+            if self.board.move_piece(self.x, self.y, x, y):
+                self.board.field[x][y].sprite.rect.center = self.get_coords(x, y)
+                pygame.sprite.spritecollide(self.board.field[x][y].sprite,
+                                            self.all_sprites, True)
+                self.board.num += 1
+                self.all_sprites.add(self.board.field[x][y].sprite)
+                if check_mat(self.board):
+                    self.finish()
             self.x = self.y = -1
         elif self.board.cell(cell[1], cell[0]) != '  ':
             self.y, self.x = cell
