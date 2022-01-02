@@ -1,6 +1,6 @@
 import pygame
 
-import start
+import menu
 from main import fps, terminate, load_image
 
 
@@ -48,4 +48,4 @@ class Finish:
         self.back()
 
     def back(self):
-        start_window = start.Chess(self.screen, self.clock)
+        start_window = menu.Menu(self.screen, self.clock)

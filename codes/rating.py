@@ -15,7 +15,7 @@ class Rating:
 
         self.all_sprites = pygame.sprite.Group()
         self.buttons = pygame.sprite.Group()
-        Button('Назад', 20, 20, 100, 30, self, self.all_sprites, self.buttons)
+        Button('Назад', 20, 20, self.all_sprites, self.buttons)
 
         self.main()
 

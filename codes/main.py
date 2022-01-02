@@ -24,29 +24,24 @@ def load_image(name, colorkey=None):
         if colorkey == -1:
             colorkey = image.get_at((0, 0))
         image.set_colorkey(colorkey)
-    else:
-        pass
-        # image = image.convert_alpha()
     return image
 
 
 class Button(pygame.sprite.Sprite):
-    def __init__(self, text, x, y, width, height, menu, *groups):
+    def __init__(self, text, x, y, *groups):
         super().__init__(*groups)
         self.text = text
-        self.menu_window = menu
-        self.pos = [x, y, width, height]
-        self.rect = pygame.rect.Rect(*self.pos)
         self.font = pygame.font.Font(None, 42)
+        self.text_r = self.font.render(self.text, True, pygame.Color('black'))
+        self.rect = pygame.rect.Rect(*[x, y, self.text_r.get_width() + 10, self.text_r.get_height() + 6])
 
     def render(self, screen):
         pygame.draw.rect(screen, (255, 255, 255), self.rect)
-        string_rendered = self.font.render(self.text, True, pygame.Color('black'))
-        screen.blit(string_rendered, self.rect)
+        screen.blit(self.text_r, (self.rect.x + 5, self.rect.y + 3))
 
     def check_click(self, coords):
-        return self.pos[0] <= coords[0] <= self.pos[0] + self.pos[2] and \
-               self.pos[1] <= coords[1] <= self.pos[1] + self.pos[3]
+        return self.rect.x <= coords[0] <= self.rect.x + self.rect.w and \
+               self.rect.y <= coords[1] <= self.rect.y + self.rect.h
 
     def swap_window(self):
         return self.text
