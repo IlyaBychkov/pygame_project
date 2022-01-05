@@ -83,7 +83,7 @@ class Menu:
                             elif event.key in (pygame.K_RETURN, pygame.K_ESCAPE, pygame.K_TAB):
                                 obj.active = False
                             else:
-                                if len(obj.text) < 20:
+                                if len(obj.text) < 15:
                                     obj.text += event.unicode
             self.screen.blit(self.fon, (0, 0))
             for obj in self.all_sprites:
