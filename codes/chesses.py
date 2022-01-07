@@ -1,6 +1,5 @@
 WHITE = 1
 BLACK = 2
-NUM = 0
 
 
 # Удобная функция для вычисления цвета противника
@@ -9,6 +8,21 @@ def opponent(color):
         return BLACK
     else:
         return WHITE
+
+
+def print_board(board):  # Распечатать доску в текстовом виде (см. скриншот)
+    print('     +----+----+----+----+----+----+----+----+')
+    for row in range(7, -1, -1):
+        print(' ', row, end='  ')
+        for col in range(8):
+            print('|', board.cell(row, col), end=' ')
+        print('|')
+        print('     +----+----+----+----+----+----+----+----+')
+    print(end='        ')
+    for col in range(8):
+        print(col, end='    ')
+    print()
+
 
 
 def check_mat(board):
@@ -27,13 +41,12 @@ def check_mat(board):
 
 
 def main():
-    global NUM
     # Создаём шахматную доску
     board = Board()
     # Цикл ввода команд игроков
     # print_board(board)
     while True:
-        NUM += 1
+        board.NUM += 1
         if board.current_player_color() == WHITE:
             print('Ход белых:')
         else:
@@ -102,6 +115,7 @@ def correct_coords(row, col):
 
 class Board:
     def __init__(self, width=8, height=8, left=10, top=10, cell_size=10, width_frame=2):
+        self.NUM = 0
         self.width = width
         self.height = height
         self.left = left
@@ -109,7 +123,6 @@ class Board:
         self.cell_size = cell_size
         self.width_frame = width_frame
         self.color = WHITE
-        self.num = 0
         self.field = []
         for row in range(8):
             self.field.append([None] * 8)
@@ -122,11 +135,11 @@ class Board:
             Pawn(WHITE), Pawn(WHITE), Pawn(WHITE), Pawn(WHITE)
         ]
         self.field[6] = [
-            Pawn(BLACK), Pawn(BLACK), Pawn(BLACK), Pawn(BLACK),
+            Pawn(BLACK), Pawn(WHITE), Pawn(BLACK), Pawn(BLACK),
             Pawn(BLACK), Pawn(BLACK), Pawn(BLACK), Pawn(BLACK)
         ]
         self.field[7] = [
-            Rook(BLACK), Knight(BLACK), Bishop(BLACK), Queen(BLACK),
+            Rook(BLACK), None, Bishop(BLACK), Queen(BLACK),
             King(BLACK), Bishop(BLACK), Knight(BLACK), Rook(BLACK)
         ]
 
@@ -228,18 +241,18 @@ class Board:
             self.field = pred[:]
             print('Вам шах!')
             return False
-        x = 7 if self.color == WHITE else 0
-        if row1 == x and type(self.get_piece(row1, col1)) is Pawn:
-            print("Выберите фигуру, где N - конь, B - слон, R - Ладья и Q - ферзь:")
-            le = input()
-            if le == "N":
-                self.field[row1][col1] = Knight(self.color)
-            elif le == "B":
-                self.field[row1][col1] = Bishop(self.color)
-            elif le == "R":
-                self.field[row1][col1] = Rook(self.color)
-            elif le == "Q":
-                self.field[row1][col1] = Queen(self.color)
+        # x = 7 if self.color == WHITE else 0
+        # if row1 == x and type(self.get_piece(row1, col1)) is Pawn:
+        #     print("Выберите фигуру, где N - конь, B - слон, R - Ладья и Q - ферзь:")
+        #     le = input()
+        #     if le == "N":
+        #         self.field[row1][col1] = Knight(self.color)
+        #     elif le == "B":
+        #         self.field[row1][col1] = Bishop(self.color)
+        #     elif le == "R":
+        #         self.field[row1][col1] = Rook(self.color)
+        #     elif le == "Q":
+        #         self.field[row1][col1] = Queen(self.color)
         self.color = opponent(self.color)
         return True
 
@@ -292,15 +305,17 @@ class Pawn:
 
     def can_move(self, board, row, col, row1, col1):
         # "взятие на проходе" реализовано
-        if col != col1:
-            direction = 1 if (self.color == WHITE) else -1
-            if (self.can_attack(board, row, col, row1, col1) and
-                    type(board.field[row1 - direction][col1]) is Pawn and
-                    board.field[row1 - direction][col1].color != self.color and
-                    board.field[row1 - direction][col1].flag == board.num - 1):
-                board.field[row1 - direction][col1] = None
-                return True
-            return False
+        # if col != col1:
+        #     direction = 1 if (self.color == WHITE) else -1
+        #     # print(board.field[row1 - direction][col1].flag, board.NUM - 1)
+        #     if (self.can_attack(board, row, col, row1, col1) and
+        #             type(board.field[row1 - direction][col1]) is Pawn and
+        #             board.field[row1 - direction][col1].color != self.color):
+        #             # board.field[row1 - direction][col1].flag == board.NUM):
+        #         board.field[row1 - direction][col1] = None
+        #         print(1)
+        #         return True
+        #     return False
 
         # Пешка может сделать из начального положения ход на 2 клетки
         # вперёд, поэтому поместим индекс начального ряда в start_row.
@@ -319,7 +334,7 @@ class Pawn:
         if (row == start_row
                 and row + 2 * direction == row1
                 and board.field[row + direction][col] is None):
-            self.flag = board.num
+            self.flag = board.NUM
             return True
 
         return False

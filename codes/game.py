@@ -48,7 +48,6 @@ class Game:
                         self.board.cell_size * (j + 0.5)), self.board.left + int(
                                                                     self.board.cell_size * (
                                                                                 7 - i + 0.5))
-        self.NUM = 1
         self.main()
 
     def main(self):
@@ -80,27 +79,27 @@ class Game:
                 x = 7 - i
                 y = j
                 r, g, b = colors[(i + j) % 2]
-                if (x == self.x and y == self.y) or self.board.field[self.x][self.y].can_move(
-                        self.board, self.x, self.y, x, y) and not self.board.field[x][y]:
-                    if (i + j) % 2:
-                        r, g, b = colors[5]
-                    else:
-                        r, g, b = colors[4]
-                elif (x != self.x or y != self.y) and self.board.field[self.x][self.y].can_attack(
-                        self.board, self.x, self.y, x, y) and self.board.field[x][y] and \
-                        self.board.field[x][y].color != self.board.field[self.x][self.y].color:
-                    if (i + j) % 2:
-                        r, g, b = colors[3]
-                    else:
-                        r, g, b = colors[2]
+                # if (x == self.x and y == self.y) or self.board.field[self.x][self.y].can_move(
+                #         self.board, self.x, self.y, x, y) and not self.board.field[x][y]:
+                #     if (i + j) % 2:
+                #         r, g, b = colors[5]
+                #     else:
+                #         r, g, b = colors[4]
+                # elif (x != self.x or y != self.y) and self.board.field[self.x][self.y].can_attack(
+                #         self.board, self.x, self.y, x, y) and self.board.field[x][y] and \
+                #         self.board.field[x][y].color != self.board.field[self.x][self.y].color:
+                #     if (i + j) % 2:
+                #         r, g, b = colors[3]
+                #     else:
+                #         r, g, b = colors[2]
                 pygame.draw.rect(self.screen, (r, g, b),
                                  [self.board.left + self.board.cell_size * j,
                                   self.board.top + self.board.cell_size * i,
                                   self.board.cell_size, self.board.cell_size])
-        if self.board.current_player_color() == WHITE:
-            print('Ход белых:')
-        else:
-            print('Ход чёрных:')
+        # if self.board.current_player_color() == WHITE:
+        #     print('Ход белых:')
+        # else:
+        #     print('Ход чёрных:')
 
     def get_cell(self, mouse_pos):
         cell_x = (mouse_pos[0] - self.board.left) // self.board.cell_size
@@ -117,18 +116,45 @@ class Game:
         y, x = cell
         if self.x != -1:
             if self.board.move_piece(self.x, self.y, x, y):
+                self.board.NUM += 1
                 self.board.field[x][y].sprite.rect.center = self.get_coords(x, y)
                 pygame.sprite.spritecollide(self.board.field[x][y].sprite,
                                             self.all_sprites, True)
-                self.board.num += 1
-                self.all_sprites.add(self.board.field[x][y].sprite)
-                if check_mat(self.board):
-                    self.finish()
+                # if check_mat(self.board):
+                #     self.finish()
+                fin = 7 if self.board.color == BLACK else 0
+                if fin == x and type(self.board.get_piece(x, y)) is chesses.Pawn:
+                    # print("Выберите фигуру, где N - конь, B - слон, R - Ладья и Q - ферзь:")
+                    # le = input()
+                    clr = chesses.opponent(self.board.color)
+                    le = 'Q'
+                    if le == "N":
+                        self.board.field[x][y] = chesses.Knight(clr)
+                    elif le == "B":
+                        self.board.field[x][y] = chesses.Bishop(clr)
+                    elif le == "R":
+                        self.board.field[x][y] = chesses.Rook(clr)
+                    elif le == "Q":
+                        self.board.field[x][y] = chesses.Queen(clr)
+                        self.board.field[x][y].sprite = pygame.sprite.Sprite(self.all_sprites)
+                        img = self.images[self.board.cell(x, y)]
+                        koeff = (self.board.cell_size - 5) / img.get_height()
+                        self.board.field[x][y].sprite.image = pygame.transform.scale(
+                            self.images[self.board.cell(x, y)], (
+                                img.get_width() * koeff, img.get_height() * koeff))
+
+                        self.board.field[x][y].sprite.rect = self.board.field[x][
+                            y].sprite.image.get_rect()
+
+                        self.board.field[x][y].sprite.rect.center = self.get_coords(x, y)
+                else:
+                    self.all_sprites.add(self.board.field[x][y].sprite)
             self.x = self.y = -1
         elif self.board.cell(cell[1], cell[0]) != '  ':
             self.y, self.x = cell
         else:
             self.x = self.y = -1
+        chesses.print_board(self.board)
 
     def get_click(self, mouse_pos):
         cell = self.get_cell(mouse_pos)
