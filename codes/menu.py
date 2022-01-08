@@ -1,8 +1,8 @@
 import pygame
 
-import game
 import rating
 import start
+import game
 from main import load_image, fps, terminate, Button
 
 
@@ -13,6 +13,7 @@ class InputName(pygame.sprite.Sprite):
         self.active = False
         self.text = text
         self.num = text[-1]
+        self.color = 'Белые' if self.num == '1' else 'Черные'
         self.name_font = pygame.font.Font(None, 42)
         self.manual_font = pygame.font.Font(None, 32)
         self.rect = pygame.rect.Rect(*[x, y, 0, 0])
@@ -24,12 +25,28 @@ class InputName(pygame.sprite.Sprite):
         pygame.draw.rect(screen, self.colors[self.active], self.rect, 2)
         screen.blit(text_r, (self.rect.x + 5, self.rect.y + 3))
 
-        manual_r = self.manual_font.render(f'Введите ник Игрока{self.num}:', True, pygame.Color('black'))
+        manual_r = self.manual_font.render(f'Игрок{self.num} ({self.color}):', True,
+                                           pygame.Color('black'))
         screen.blit(manual_r, (self.rect.x - manual_r.get_width() - 15, self.rect.y + 8))
 
     def check_click(self, coords):
         return self.rect.x <= coords[0] <= self.rect.x + self.rect.w and \
                self.rect.y <= coords[1] <= self.rect.y + self.rect.h
+
+    def get_click(self, mouse_pos):
+        return self.check_click(mouse_pos)
+
+
+class RadioButton(Button):
+    def __init__(self, text, x, y, active, *groups):
+        super().__init__(text, x, y, *groups)
+        self.active = active
+        self.font = pygame.font.Font(None, 30)
+
+    def render(self, screen):
+        super().render(screen)
+        if self.active:
+            pygame.draw.rect(screen, (0, 0, 255), self.rect, 3)
 
     def get_click(self, mouse_pos):
         return self.check_click(mouse_pos)
@@ -52,8 +69,12 @@ class Menu:
         Button('Рейтинг', 20, 100, self.all_sprites, self.buttons)
 
         self.names = pygame.sprite.Group()
-        InputName('Player1', 550, 225, self.all_sprites, self.names)
-        InputName('Player2', 550, 300, self.all_sprites, self.names)
+        InputName('Player1', 500, 225, self.all_sprites, self.names)
+        InputName('Player2', 500, 300, self.all_sprites, self.names)
+
+        self.radio_btns = pygame.sprite.Group()
+        RadioButton('Классика', 300, 400, True, self.all_sprites, self.radio_btns)
+        RadioButton('Шахматы-960', 475, 400, False, self.all_sprites, self.radio_btns)
 
         self.main()
 
@@ -75,6 +96,11 @@ class Menu:
                             obj.active = not obj.active
                         else:
                             obj.active = False
+                    for obj in self.radio_btns:
+                        if obj.get_click(event.pos):
+                            for i in self.radio_btns:
+                                i.active = False
+                            obj.active = True
                 elif event.type == pygame.KEYDOWN:
                     for obj in self.names:
                         if obj.active:
@@ -93,20 +119,21 @@ class Menu:
         if next_window == 'Назад':
             self.back()
         elif next_window == 'Играть':
-            self.start_game()
+            game = None
+            for obj in self.radio_btns:
+                if obj.active:
+                    game = obj.text
+            self.start_game(game)
         elif next_window == 'Рейтинг':
             self.rating()
         else:
             terminate()
 
-    def start_game(self):
-        game_window = game.Game(self.screen, self.clock)
-
-    def change_game(self):
-        pass
-
-    def change_names(self):
-        pass
+    def start_game(self, var):
+        if var == 'Классика':
+            game_window = game.Game(self.screen, self.clock)
+        elif var == 'Шахматы-960':
+            game_window = game.Game(self.screen, self.clock)
 
     def rating(self):
         rating_window = rating.Rating(self.screen, self.clock)

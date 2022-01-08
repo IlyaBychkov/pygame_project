@@ -33,7 +33,7 @@ class Rating:
         x, y = 80, 100
         step_x, step_y = 200, 70
         res = self.cur.execute("""select * from rating order by -winrate""").fetchall()
-        res = [('№', 'Name', 'All', 'W win', 'B win', '% win')] + res
+        res = [('№', 'Name', 'Games', 'White', 'Black', '% win')] + res
         id = 0
         for querry in res:
             self.print_text(str(id), x, y)

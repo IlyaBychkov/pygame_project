@@ -36,7 +36,7 @@ class Button(pygame.sprite.Sprite):
         self.rect = pygame.rect.Rect(*[x, y, self.text_r.get_width() + 10, self.text_r.get_height() + 6])
 
     def render(self, screen):
-        pygame.draw.rect(screen, (255, 255, 255), self.rect)
+        pygame.draw.rect(screen, pygame.Color('darkgrey'), self.rect)
         screen.blit(self.text_r, (self.rect.x + 5, self.rect.y + 3))
 
     def check_click(self, coords):
