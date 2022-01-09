@@ -19,19 +19,19 @@ class Board:
             Rook(WHITE), Knight(WHITE), Bishop(WHITE), Queen(WHITE),
             King(WHITE), Bishop(WHITE), Knight(WHITE), Rook(WHITE)
         ]
-        # self.field[1] = [
-        #     Pawn(WHITE), Pawn(WHITE), Pawn(WHITE), Pawn(WHITE),
-        #     Pawn(WHITE), Pawn(WHITE), Pawn(WHITE), Pawn(WHITE)
-        # ]
-        # self.field[6] = [
-        #     Pawn(BLACK), Pawn(BLACK), Pawn(BLACK), Pawn(BLACK),
-        #     Pawn(BLACK), Pawn(BLACK), Pawn(BLACK), Pawn(BLACK)
-        # ]
-        # self.field[7] = [
-        #     Rook(BLACK), Knight(BLACK), Bishop(BLACK), Queen(BLACK),
-        #     King(BLACK), Bishop(BLACK), Knight(BLACK), Rook(BLACK)
-        # ]
-        self.field[7][4] = King(BLACK)
+        self.field[1] = [
+            Pawn(WHITE), Pawn(WHITE), Pawn(WHITE), Pawn(WHITE),
+            Pawn(WHITE), Pawn(WHITE), Pawn(WHITE), Pawn(WHITE)
+        ]
+        self.field[6] = [
+            Pawn(BLACK), Pawn(BLACK), Pawn(BLACK), Pawn(BLACK),
+            Pawn(BLACK), Pawn(BLACK), Pawn(BLACK), Pawn(BLACK)
+        ]
+        self.field[7] = [
+            Rook(BLACK), Knight(BLACK), Bishop(BLACK), Queen(BLACK),
+            King(BLACK), Bishop(BLACK), Knight(BLACK), Rook(BLACK)
+        ]
+        # self.field[7][4] = King(BLACK)
 
     def get_coords(self, x, y):
         return (self.left + int(self.cell_size * (y + 0.5)), self.left + int(
