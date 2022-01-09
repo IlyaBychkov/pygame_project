@@ -135,11 +135,11 @@ class Board:
             Pawn(WHITE), Pawn(WHITE), Pawn(WHITE), Pawn(WHITE)
         ]
         self.field[6] = [
-            Pawn(BLACK), Pawn(WHITE), Pawn(BLACK), Pawn(BLACK),
+            Pawn(BLACK), Pawn(BLACK), Pawn(BLACK), Pawn(BLACK),
             Pawn(BLACK), Pawn(BLACK), Pawn(BLACK), Pawn(BLACK)
         ]
         self.field[7] = [
-            Rook(BLACK), None, Bishop(BLACK), Queen(BLACK),
+            Rook(BLACK), Knight(BLACK), Bishop(BLACK), Queen(BLACK),
             King(BLACK), Bishop(BLACK), Knight(BLACK), Rook(BLACK)
         ]
 
@@ -269,7 +269,7 @@ class Rook:
     def char(self):
         return 'R'
 
-    def can_move(self, board, row, col, row1, col1):
+    def can_move(self, board, row, col, row1, col1, fl=0):
         if row != row1 and col != col1:
             return False
 
@@ -303,19 +303,20 @@ class Pawn:
     def char(self):
         return 'P'
 
-    def can_move(self, board, row, col, row1, col1):
+    def can_move(self, board, row, col, row1, col1, fl=0):
         # "взятие на проходе" реализовано
-        # if col != col1:
-        #     direction = 1 if (self.color == WHITE) else -1
-        #     # print(board.field[row1 - direction][col1].flag, board.NUM - 1)
-        #     if (self.can_attack(board, row, col, row1, col1) and
-        #             type(board.field[row1 - direction][col1]) is Pawn and
-        #             board.field[row1 - direction][col1].color != self.color):
-        #             # board.field[row1 - direction][col1].flag == board.NUM):
-        #         board.field[row1 - direction][col1] = None
-        #         print(1)
-        #         return True
-        #     return False
+        if col != col1:
+            direction = 1 if (self.color == WHITE) else -1
+            # print(board.field[row1 - direction][col1].flag, board.NUM - 1)
+            if (self.can_attack(board, row, col, row1, col1) and
+                    type(board.field[row1 - direction][col1]) is Pawn and
+                    board.field[row1 - direction][col1].color != self.color and
+                    board.field[row1 - direction][col1].flag == board.NUM - 1):
+                # print(board.field[row1 - direction][col1].flag, board.NUM)
+                board.field[row1 - direction][col1].sprite.kill()
+                board.field[row1 - direction][col1] = None
+                return True
+            return False
 
         # Пешка может сделать из начального положения ход на 2 клетки
         # вперёд, поэтому поместим индекс начального ряда в start_row.
@@ -357,7 +358,7 @@ class Knight:
     def char(self):
         return 'N'  # kNight, буква 'K' уже занята королём
 
-    def can_move(self, board, row, col, row1, col1):
+    def can_move(self, board, row, col, row1, col1, fl=0):
         return abs(row - row1) * abs(col - col1) == 2
 
     def can_attack(self, board, row, col, row1, col1):
@@ -375,7 +376,7 @@ class King:
     def char(self):
         return 'K'
 
-    def can_move(self, board, row, col, row1, col1):
+    def can_move(self, board, row, col, row1, col1, fl=0):
         if (abs(row - row1) <= 1 and abs(col - col1) <= 1 and
                 not board.is_under_attack(row1, col1, self.color)):
             self.flag = 0
@@ -452,7 +453,7 @@ class Queen:
     def char(self):
         return 'Q'
 
-    def can_move(self, board, row, col, row1, col1):
+    def can_move(self, board, row, col, row1, col1, fl=0):
         i, j = row + 1, col + 1
         while i < 8 and j < 8:
             if i == row1 and j == col1:
@@ -517,7 +518,7 @@ class Bishop:
     def char(self):
         return 'B'
 
-    def can_move(self, board, row, col, row1, col1):
+    def can_move(self, board, row, col, row1, col1, fl=0):
         i, j = row + 1, col + 1
         while i < 8 and j < 8:
             if i == row1 and j == col1:

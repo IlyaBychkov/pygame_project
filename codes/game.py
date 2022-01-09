@@ -79,12 +79,13 @@ class Game:
                 x = 7 - i
                 y = j
                 r, g, b = colors[(i + j) % 2]
-                # if (x == self.x and y == self.y) or self.board.field[self.x][self.y].can_move(
-                #         self.board, self.x, self.y, x, y) and not self.board.field[x][y]:
-                #     if (i + j) % 2:
-                #         r, g, b = colors[5]
-                #     else:
-                #         r, g, b = colors[4]
+                if (x == self.x and y == self.y):
+                     # or self.board.field[self.x][self.y].can_move(
+                     #    self.board, self.x, self.y, x, y) and not self.board.field[x][y]:
+                    if (i + j) % 2:
+                        r, g, b = colors[5]
+                    else:
+                        r, g, b = colors[4]
                 # elif (x != self.x or y != self.y) and self.board.field[self.x][self.y].can_attack(
                 #         self.board, self.x, self.y, x, y) and self.board.field[x][y] and \
                 #         self.board.field[x][y].color != self.board.field[self.x][self.y].color:
@@ -120,8 +121,8 @@ class Game:
                 self.board.field[x][y].sprite.rect.center = self.get_coords(x, y)
                 pygame.sprite.spritecollide(self.board.field[x][y].sprite,
                                             self.all_sprites, True)
-                # if check_mat(self.board):
-                #     self.finish()
+                if check_mat(self.board):
+                    self.finish()
                 fin = 7 if self.board.color == BLACK else 0
                 if fin == x and type(self.board.get_piece(x, y)) is chesses.Pawn:
                     # print("Выберите фигуру, где N - конь, B - слон, R - Ладья и Q - ферзь:")
@@ -149,11 +150,21 @@ class Game:
                         self.board.field[x][y].sprite.rect.center = self.get_coords(x, y)
                 else:
                     self.all_sprites.add(self.board.field[x][y].sprite)
-            self.x = self.y = -1
+                self.x = self.y = -1
+            else:
+                piece = self.board.get_piece(x, y)
+                if piece is not None and piece.color == self.board.color:
+                    self.x, self.y = x, y
+                else:
+                    self.x = self.y = -1
         elif self.board.cell(cell[1], cell[0]) != '  ':
-            self.y, self.x = cell
+            piece = self.board.get_piece(x, y)
+            if piece is not None and piece.color == self.board.color:
+                self.x, self.y = x, y
+            else:
+                self.x = self.y = -1
         else:
-            self.x = self.y = -1
+                self.x = self.y = -1
         chesses.print_board(self.board)
 
     def get_click(self, mouse_pos):
@@ -169,4 +180,5 @@ class Game:
         pass
 
     def finish(self):
-        finish_window = finish.Finish(self.screen, self.clock, self.board.current_player_color())
+        clr = chesses.opponent(self.board.current_player_color())
+        finish_window = finish.Finish(self.screen, self.clock, clr)
