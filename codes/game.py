@@ -145,8 +145,6 @@ class Game:
             self.chooze_white_sprites.draw(self.screen)
         else:
             self.chooze_black_sprites.draw(self.screen)
-        # print(self.pawn_x, self.pawn_y, self.chooze_fig_fl)
-        # self.chooze_fig_fl = 0
 
     def get_cell(self, mouse_pos):
         cell_x = (mouse_pos[0] - self.board.left) // self.board.cell_size

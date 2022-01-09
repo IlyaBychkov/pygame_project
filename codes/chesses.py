@@ -32,6 +32,8 @@ class Board:
             King(BLACK), Bishop(BLACK), Knight(BLACK), Rook(BLACK)
         ]
         # self.field[7][4] = King(BLACK)
+        # self.field[0][4] = King(WHITE)
+        # self.field[0][7] = Rook(WHITE)
 
     def get_coords(self, x, y):
         return (self.left + int(self.cell_size * (y + 0.5)), self.left + int(
@@ -43,7 +45,7 @@ class Board:
                 if (self.field[i][j] is not None and
                         (i != row or j != col) and
                         self.field[i][j].color != color and
-                        self.field[i][j].can_attack(self, i, j, row, col)):
+                        self.field[i][j].can_attack(self, i, j, row, col, 0)):
                     return True
         return False
 
@@ -66,13 +68,12 @@ class Board:
         if piece is None:
             return False
         if piece.get_color() != self.color:
-            x = 'белых' if self.color == WHITE else 'черных'
             return False
         if self.field[row1][col1] is None:
             if not piece.can_move(self, row, col, row1, col1, fl):
                 return False
         elif self.field[row1][col1].get_color() == self.opponent(piece.get_color()):
-            if not piece.can_attack(self, row, col, row1, col1):
+            if not piece.can_attack(self, row, col, row1, col1, fl):
                 return False
         else:
             return False
@@ -157,12 +158,12 @@ class Rook:
         for c in range(col + step, col1, step):
             if not (board.get_piece(row, c) is None):
                 return False
-
-        self.flag = 0
+        if fl:
+            self.flag = 0
         return True
 
-    def can_attack(self, board, row, col, row1, col1):
-        return self.can_move(board, row, col, row1, col1)
+    def can_attack(self, board, row, col, row1, col1, fl=1):
+        return self.can_move(board, row, col, row1, col1, fl)
 
 
 class Pawn:
@@ -179,7 +180,7 @@ class Pawn:
     def can_move(self, board, row, col, row1, col1, fl=1):
         if col != col1:
             direction = 1 if (self.color == WHITE) else -1
-            if (self.can_attack(board, row, col, row1, col1) and
+            if (self.can_attack(board, row, col, row1, col1, fl) and
                     type(board.field[row1 - direction][col1]) is Pawn and
                     board.field[row1 - direction][col1].color != self.color and
                     board.field[row1 - direction][col1].flag == board.NUM - 1):
@@ -246,7 +247,8 @@ class King:
     def can_move(self, board, row, col, row1, col1, fl=1):
         if (abs(row - row1) <= 1 and abs(col - col1) <= 1 and
                 not board.is_under_attack(row1, col1, self.color)):
-            self.flag = 0
+            if fl:
+                self.flag = 0
             return True
 
         fig = board.get_piece(7, 0)
