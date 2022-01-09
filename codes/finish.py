@@ -1,14 +1,15 @@
 import pygame
 
-import start
+import menu
 from main import fps, terminate, load_image
 
 
 class Finish:
-    def __init__(self, screen, clock, winner):
+    def __init__(self, screen, clock, winner, fl):
         self.screen = screen
         self.size = self.width, self.height = screen.get_width(), screen.get_height()
         self.clock = clock
+        self.fl = fl
         self.winner = 'белые' if winner == 1 else 'черные'
 
         pygame.display.set_caption("Конец")
@@ -20,7 +21,10 @@ class Finish:
         self.main()
 
     def write(self):
-        intro_text = [f"Победили {self.winner}", 'Нажмите любую кнопку']
+        if self.fl == 1:
+            intro_text = [f"Победили {self.winner}!", 'Нажмите любую кнопку']
+        else:
+            intro_text = ["Ничья!", 'Нажмите любую кнопку']
         font = pygame.font.Font(None, 30)
         text_coord = self.height // 2 - 15
         for line in intro_text:
@@ -48,4 +52,4 @@ class Finish:
         self.back()
 
     def back(self):
-        start_window = start.Chess(self.screen, self.clock)
+        next_window = menu.Menu(self.screen, self.clock)
