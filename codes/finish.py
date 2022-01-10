@@ -9,7 +9,7 @@ class Finish:
         self.screen = screen
         self.size = self.width, self.height = screen.get_width(), screen.get_height()
         self.clock = clock
-        self.winner = winner
+        self.winner = 'белые' if winner == 1 else 'черные'
 
         pygame.display.set_caption("Конец")
         self.fon = pygame.transform.scale(load_image('finish_fon.png'), (self.width, self.height))
