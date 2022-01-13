@@ -77,6 +77,9 @@ class Game:
                                 7 - i + 0.5))
         self.pawn_x = self.pawn_y = -1
         self.chooze_fig_fl = 0
+        self.move_x = self.move_y = self.move_to_x = self.move_to_y = self.v_x = self.v_y = -1
+        self.v = 350
+        self.move_fl = False
         self.main()
 
     def main(self):
@@ -88,12 +91,60 @@ class Game:
                     return
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     self.get_click(event.pos)
+            if self.move_fl:
+                self.move_fig()
             self.screen.fill((0, 0, 0))
             self.render()
             self.all_sprites.draw(self.screen)
             pygame.display.flip()
             self.clock.tick(fps)
         self.finish(1)
+
+    def move_fig(self):
+        x, y = self.board.field[self.move_to_x][self.move_to_y].sprite.rect.center
+        to_x, to_y = self.board.get_coords(self.move_to_x, self.move_to_y)
+        if x > to_x:
+            x = max(x - int(self.v_x / fps), to_x)
+        else:
+            x = min(x + int(self.v_x / fps), to_x)
+        if y > to_y:
+            y = max(y - int(self.v_y / fps), to_y)
+        else:
+            y = min(y + self.v_y / fps, to_y)
+        # x = y = to_x = to_y = -1
+        # print(self.x, self.y, self.v_x / fps, self.v_y / fps)
+        if (x, y) == (to_x, to_y):
+            x, y = self.move_to_x, self.move_to_y
+            self.board.field[x][y].sprite.rect.center = self.board.get_coords(x, y)
+            pygame.sprite.spritecollide(self.board.field[x][y].sprite,
+                                        self.all_sprites, True)
+            fl = self.board.check_mat()
+            if fl:
+                self.finish(fl)
+            fin = 7 if self.board.color == BLACK else 0
+            if fin == x and type(self.board.get_piece(x, y)) is chesses.Pawn:
+                clr = self.board.opponent(self.board.color)
+                self.pawn_x, self.pawn_y = x, y
+                self.chooze_fig_fl = clr + 1
+                self.board.field[x][y].sprite = pygame.sprite.Sprite(self.all_sprites)
+                img = self.images[self.board.cell(x, y)]
+                koeff = (self.board.cell_size - 5) / img.get_height()
+                self.board.field[x][y].sprite.image = pygame.transform.scale(
+                    self.images[self.board.cell(x, y)], (
+                        img.get_width() * koeff, img.get_height() * koeff))
+
+                self.board.field[x][y].sprite.rect = self.board.field[x][
+                    y].sprite.image.get_rect()
+
+                self.board.field[x][y].sprite.rect.center = self.board.get_coords(x, y)
+            else:
+                self.all_sprites.add(self.board.field[x][y].sprite)
+            self.x = self.y = -1
+            self.move_x = self.move_y = self.move_to_x = self.move_to_y = -1
+            self.move_fl = False
+            return
+        self.board.field[self.move_to_x][self.move_to_y].sprite.rect.center = x, y
+        # print(x, y, to_x, to_y, v_x, v_y)
 
     def render(self):
         pygame.draw.rect(self.screen, 'white',
@@ -154,37 +205,34 @@ class Game:
         return cell_x, 7 - cell_y
 
     def on_click(self, cell):
-        if self.chooze_fig_fl:
+        if self.chooze_fig_fl or self.move_fl:
             return
         y, x = cell
         if self.x != -1:
             if self.board.move_piece(self.x, self.y, x, y):
+                self.move_fl = True
+                self.move_x = self.x
+                self.move_y = self.y
+                self.move_to_x = x
+                self.move_to_y = y
                 self.board.NUM += 1
-                self.board.field[x][y].sprite.rect.center = self.board.get_coords(x, y)
-                pygame.sprite.spritecollide(self.board.field[x][y].sprite,
-                                            self.all_sprites, True)
-                fl = self.board.check_mat()
-                if fl:
-                    self.finish(fl)
-                fin = 7 if self.board.color == BLACK else 0
-                if fin == x and type(self.board.get_piece(x, y)) is chesses.Pawn:
-                    clr = self.board.opponent(self.board.color)
-                    self.pawn_x, self.pawn_y = x, y
-                    self.chooze_fig_fl = clr + 1
-                    self.board.field[x][y].sprite = pygame.sprite.Sprite(self.all_sprites)
-                    img = self.images[self.board.cell(x, y)]
-                    koeff = (self.board.cell_size - 5) / img.get_height()
-                    self.board.field[x][y].sprite.image = pygame.transform.scale(
-                        self.images[self.board.cell(x, y)], (
-                            img.get_width() * koeff, img.get_height() * koeff))
-
-                    self.board.field[x][y].sprite.rect = self.board.field[x][
-                        y].sprite.image.get_rect()
-
-                    self.board.field[x][y].sprite.rect.center = self.board.get_coords(x, y)
+                st_x, st_y = self.board.get_coords(self.move_x, self.move_y)
+                to_x, to_y = self.board.get_coords(self.move_to_x, self.move_to_y)
+                if to_x != st_x and to_y != st_y:
+                    kf = abs((to_x - st_x) / (to_y - st_y))
+                    kf1 = abs((to_y - st_y) / (to_x - st_x))
+                    # x * x + x * x * kf * kf = self.v * self.v
+                    # x * x * (kf * kf + 1) = self.v * self.v
+                    v_y = ((self.v * self.v) / (kf * kf + 1)) ** 0.5
+                    v_x = ((self.v * self.v) / (kf1 * kf1 + 1)) ** 0.5
+                elif to_x == st_x:
+                    v_y = 200
+                    v_x = 0
                 else:
-                    self.all_sprites.add(self.board.field[x][y].sprite)
-                self.x = self.y = -1
+                    v_x = 200
+                    v_y = 0
+                self.v_x = v_x
+                self.v_y = v_y
             else:
                 piece = self.board.get_piece(x, y)
                 if piece is not None and piece.color == self.board.color:
@@ -199,7 +247,7 @@ class Game:
                 self.x = self.y = -1
         else:
             self.x = self.y = -1
-        self.board.print_board()
+        # self.board.print_board()
 
     def get_click(self, mouse_pos):
         if self.chooze_fig_fl:
@@ -237,6 +285,5 @@ class Game:
         return cell
 
     def finish(self, fl):  # 1 - мат, 2 - пат
-        print(fl)
         clr = self.board.opponent(self.board.color)
         finish_window = finish.Finish(self.screen, self.clock, clr, fl)
