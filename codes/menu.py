@@ -130,10 +130,13 @@ class Menu:
             terminate()
 
     def start_game(self, var):
+        names = []
+        for obj in self.names:
+            names.append(obj.text)
         if var == 'Классика':
-            game_window = game.Game(self.screen, self.clock, flag=False)
+            game_window = game.Game(self.screen, self.clock, *names)
         elif var == 'Шахматы-960':
-            game_window = game.Game(self.screen, self.clock, flag=True)
+            game_window = game.Game(self.screen, self.clock, *names, flag=True)
 
     def rating(self):
         rating_window = rating.Rating(self.screen, self.clock)

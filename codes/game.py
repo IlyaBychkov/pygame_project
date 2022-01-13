@@ -1,13 +1,14 @@
 import pygame
 
 import finish
+import menu
 from chesses import *
-from main import fps, load_image, terminate
+from main import fps, load_image, terminate, Button
 from random import shuffle, randint
 
 
 class Game:
-    def __init__(self, screen, clock, flag=False):
+    def __init__(self, screen, clock, name_w, name_b, flag=False):
         self.board = Board(8, 8, 100, 100, 50, 3)
         if flag:
             self.gen()
@@ -15,6 +16,11 @@ class Game:
         self.screen = screen
         self.size = self.width, self.height = screen.get_width(), screen.get_height()
         self.clock = clock
+        self.name_b = name_b
+        self.name_w = name_w
+        self.scores = [0, 0]
+        self.player_b_color = 'blue'
+        self.player_w_color = 'green'
         self.x = self.y = -1
         self.images = {
             'bB': load_image('kit_figures1/bishop_black.png'),
@@ -82,6 +88,11 @@ class Game:
         self.move_x = self.move_y = self.move_to_x = self.move_to_y = self.v_x = self.v_y = -1
         self.v = 350
         self.move_fl = False
+
+        self.buttons = pygame.sprite.Group()
+        Button('Назад', 20, 20, self.buttons)
+        Button('Сдаться', 675, 550, self.buttons)
+
         self.main()
 
     def gen(self):
@@ -125,6 +136,7 @@ class Game:
         self.board.field[7][z] = Queen(BLACK)
 
     def main(self):
+        next_window = None
         running = True
         while running:
             for event in pygame.event.get():
@@ -133,6 +145,11 @@ class Game:
                     return
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     self.get_click(event.pos)
+                    for obj in self.buttons:
+                        new = obj.get_click(event.pos)
+                        if new:
+                            next_window = new
+                            running = False
             if self.move_fl:
                 self.move_fig()
             self.screen.fill((0, 0, 0))
@@ -140,7 +157,10 @@ class Game:
             self.all_sprites.draw(self.screen)
             pygame.display.flip()
             self.clock.tick(fps)
-        self.finish(1)
+        if next_window == 'Назад':
+            self.back()
+        elif next_window == 'Сдаться':
+            self.finish(3)
 
     def move_fig(self):
         x, y = self.board.field[self.move_to_x][self.move_to_y].sprite.rect.center
@@ -186,7 +206,13 @@ class Game:
             self.move_fl = False
             return
         self.board.field[self.move_to_x][self.move_to_y].sprite.rect.center = x, y
-        # print(x, y, to_x, to_y, v_x, v_y)
+
+    def print_text(self, text, x, y, size, color):
+        self.text = text
+        self.font = pygame.font.Font(None, size)
+        self.text_r = self.font.render(self.text, True, pygame.Color(color))
+        self.rect = pygame.rect.Rect(*[x, y, self.text_r.get_width(), self.text_r.get_height()])
+        self.screen.blit(self.text_r, (self.rect.x, self.rect.y))
 
     def render(self):
         pygame.draw.rect(self.screen, 'white',
@@ -220,10 +246,27 @@ class Game:
                                   self.board.cell_size, self.board.cell_size])
         if self.chooze_fig_fl:
             self.draw_chooze_fig()
-        # if self.board.current_player_color() == WHITE:
-        #     print('Ход белых:')
-        # else:
-        #     print('Ход чёрных:')
+        for obj in self.buttons:
+            obj.render(self.screen)
+
+        self.print_text('Текущий игрок:', 525, 100, 45, 'red')
+        self.print_text('Текущий цвет:', 525, 150, 45, 'red')
+        if self.board.color == BLACK:
+            now_player = self.name_b
+            now_color = 'Черный'
+            player_color = self.player_b_color
+        else:
+            now_player = self.name_w
+            now_color = 'Белый'
+            player_color = self.player_w_color
+        self.print_text(now_player, 800, 100, 40, player_color)
+        self.print_text(now_color, 800, 150, 40, 'red')
+
+        self.print_text('Очки', 690, 375, 45, 'red')
+        self.print_text(self.name_b, 550, 425, 40, self.player_b_color)
+        self.print_text(self.name_w, 830, 425, 40, self.player_w_color)
+        self.print_text(str(self.scores[0]), 575, 475, 40, self.player_b_color)
+        self.print_text(str(self.scores[1]), 855, 475, 40, self.player_w_color)
 
     def draw_chooze_fig(self):
         top, left = 630, 300
@@ -320,12 +363,25 @@ class Game:
             self.board.field[self.pawn_x][self.pawn_y].sprite.rect.center = self.board.get_coords(
                 self.pawn_x, self.pawn_y)
             self.chooze_fig_fl = 0
-            return None
         cell = self.get_cell(mouse_pos)
         if cell:
             self.on_click(cell)
-        return cell
 
-    def finish(self, fl):  # 1 - мат, 2 - пат
-        clr = self.board.opponent(self.board.color)
-        finish_window = finish.Finish(self.screen, self.clock, clr)
+    def back(self):
+        menu_window = menu.Menu(self.screen, self.clock)
+
+    def finish(self, fl):  # 1 - мат, 2 - пат, 3 - сдался
+        winner = None
+        if fl == 3:
+            if self.board.color == BLACK:
+                winner = self.name_w
+            else:
+                winner = self.name_b
+        elif fl == 2:
+            winner = 'Ничья'
+        elif fl == 1:
+            if self.board.opponent(self.board.color) == BLACK:
+                winner = self.name_b
+            else:
+                winner = self.name_w
+        finish_window = finish.Finish(self.screen, self.clock, winner)

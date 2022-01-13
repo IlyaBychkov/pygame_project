@@ -32,8 +32,8 @@ class Rating:
     def print_board(self):
         x, y = 80, 100
         step_x, step_y = 200, 70
-        res = self.cur.execute("""select * from rating order by -winrate""").fetchall()
-        res = [('№', 'Name', 'Games', 'White', 'Black', '% win')] + res
+        res = list(self.cur.execute("""select * from rating order by -winrate""").fetchall())
+        res = [('№', 'Name', 'Games', 'White', 'Black', '% win')] + res[:min(len(res), 5)]
         id = 0
         for querry in res:
             self.print_text(str(id), x, y)
