@@ -1,14 +1,16 @@
 import pygame
 
-import chesses
 import finish
-from chesses import BLACK
+from chesses import *
 from main import fps, load_image, terminate
+from random import shuffle, randint
 
 
 class Game:
-    def __init__(self, screen, clock):
-        self.board = chesses.Board(8, 8, 100, 100, 50, 3)
+    def __init__(self, screen, clock, flag=False):
+        self.board = Board(8, 8, 100, 100, 50, 3)
+        if flag:
+            self.gen()
         self.board.width_frame = 3
         self.screen = screen
         self.size = self.width, self.height = screen.get_width(), screen.get_height()
@@ -82,6 +84,46 @@ class Game:
         self.move_fl = False
         self.main()
 
+    def gen(self):
+        a = [0, 1, 2, 3, 4, 5, 6, 7]
+        shuffle(a)
+        x, y, z = sorted(a[:3])
+        for i in range(8):
+            self.board.field[0][i] = None
+            self.board.field[7][i] = None
+        self.board.field[0][x] = Rook(WHITE)
+        self.board.field[7][x] = Rook(BLACK)
+        self.board.field[0][y] = King(WHITE)
+        self.board.field[7][y] = King(BLACK)
+        self.board.field[0][z] = Rook(WHITE)
+        self.board.field[7][z] = Rook(BLACK)
+        b, c = [], []
+        for i in a[3:]:
+            if i % 2 == 0:
+                b.append(i)
+            else:
+                c.append(i)
+        i = randint(0, len(b) - 1)
+        x = b[i]
+        del b[i]
+        i = randint(0, len(b) - 1)
+        y = c[i]
+        del c[i]
+        self.board.field[0][x] = Bishop(WHITE)
+        self.board.field[7][x] = Bishop(BLACK)
+        self.board.field[0][y] = Bishop(WHITE)
+        self.board.field[7][y] = Bishop(BLACK)
+        for i in c:
+            b.append(i)
+        shuffle(b)
+        x, y, z = b
+        self.board.field[0][x] = Knight(WHITE)
+        self.board.field[7][x] = Knight(BLACK)
+        self.board.field[0][y] = Knight(WHITE)
+        self.board.field[7][y] = Knight(BLACK)
+        self.board.field[0][z] = Queen(WHITE)
+        self.board.field[7][z] = Queen(BLACK)
+
     def main(self):
         running = True
         while running:
@@ -122,7 +164,7 @@ class Game:
             if fl:
                 self.finish(fl)
             fin = 7 if self.board.color == BLACK else 0
-            if fin == x and type(self.board.get_piece(x, y)) is chesses.Pawn:
+            if fin == x and type(self.board.get_piece(x, y)) is Pawn:
                 clr = self.board.opponent(self.board.color)
                 self.pawn_x, self.pawn_y = x, y
                 self.chooze_fig_fl = clr + 1
@@ -159,13 +201,13 @@ class Game:
                 x = 7 - i
                 y = j
                 r, g, b = colors[(i + j) % 2]
-                if (x == self.x and y == self.y) or self.board.move_piece(self.x, self.y, x, y, 0) \
+                if self.x != -1 and (x == self.x and y == self.y) or self.board.move_piece(self.x, self.y, x, y, 0) \
                         and not self.board.field[x][y]:
                     if (i + j) % 2:
                         r, g, b = colors[5]
                     else:
                         r, g, b = colors[4]
-                elif (x != self.x or y != self.y) and self.board.move_piece(self.x, self.y, x, y, 0) \
+                elif self.x != -1 and (x != self.x or y != self.y) and self.board.move_piece(self.x, self.y, x, y, 0) \
                         and self.board.field[x][y] and \
                         self.board.field[x][y].color != self.board.field[self.x][self.y].color:
                     if (i + j) % 2:
@@ -226,10 +268,10 @@ class Game:
                     v_y = ((self.v * self.v) / (kf * kf + 1)) ** 0.5
                     v_x = ((self.v * self.v) / (kf1 * kf1 + 1)) ** 0.5
                 elif to_x == st_x:
-                    v_y = 200
+                    v_y = self.v
                     v_x = 0
                 else:
-                    v_x = 200
+                    v_x = self.v
                     v_y = 0
                 self.v_x = v_x
                 self.v_y = v_y
@@ -257,13 +299,13 @@ class Game:
                 return None
             self.board.field[self.pawn_x][self.pawn_y].sprite.kill()
             if cell_x == 3:
-                self.board.field[self.pawn_x][self.pawn_y] = chesses.Knight(self.chooze_fig_fl - 1)
+                self.board.field[self.pawn_x][self.pawn_y] = Knight(self.chooze_fig_fl - 1)
             elif cell_x == 2:
-                self.board.field[self.pawn_x][self.pawn_y] = chesses.Bishop(self.chooze_fig_fl - 1)
+                self.board.field[self.pawn_x][self.pawn_y] = Bishop(self.chooze_fig_fl - 1)
             elif cell_x == 1:
-                self.board.field[self.pawn_x][self.pawn_y] = chesses.Rook(self.chooze_fig_fl - 1)
+                self.board.field[self.pawn_x][self.pawn_y] = Rook(self.chooze_fig_fl - 1)
             elif cell_x == 0:
-                self.board.field[self.pawn_x][self.pawn_y] = chesses.Queen(self.chooze_fig_fl - 1)
+                self.board.field[self.pawn_x][self.pawn_y] = Queen(self.chooze_fig_fl - 1)
             self.board.field[self.pawn_x][self.pawn_y].sprite = pygame.sprite.Sprite(
                 self.all_sprites)
             img = self.images[self.board.cell(self.pawn_x, self.pawn_y)]

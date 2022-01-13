@@ -131,9 +131,9 @@ class Menu:
 
     def start_game(self, var):
         if var == 'Классика':
-            game_window = game.Game(self.screen, self.clock)
+            game_window = game.Game(self.screen, self.clock, flag=False)
         elif var == 'Шахматы-960':
-            game_window = game.Game(self.screen, self.clock)
+            game_window = game.Game(self.screen, self.clock, flag=True)
 
     def rating(self):
         rating_window = rating.Rating(self.screen, self.clock)
