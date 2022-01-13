@@ -328,4 +328,4 @@ class Game:
 
     def finish(self, fl):  # 1 - мат, 2 - пат
         clr = self.board.opponent(self.board.color)
-        finish_window = finish.Finish(self.screen, self.clock, clr, fl)
+        finish_window = finish.Finish(self.screen, self.clock, clr)
