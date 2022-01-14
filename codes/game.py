@@ -91,7 +91,7 @@ class Game:
 
         self.buttons = pygame.sprite.Group()
         Button('Назад', 20, 20, self.buttons)
-        Button('Сдаться', 675, 550, self.buttons)
+        Button('Сдаться', 665, 230, self.buttons)
 
         self.main()
 
@@ -117,7 +117,7 @@ class Game:
         i = randint(0, len(b) - 1)
         x = b[i]
         del b[i]
-        i = randint(0, len(b) - 1)
+        i = randint(0, len(c) - 1)
         y = c[i]
         del c[i]
         self.board.field[0][x] = Bishop(WHITE)
@@ -173,8 +173,6 @@ class Game:
             y = max(y - int(self.v_y / fps), to_y)
         else:
             y = min(y + self.v_y / fps, to_y)
-        # x = y = to_x = to_y = -1
-        # print(self.x, self.y, self.v_x / fps, self.v_y / fps)
         if (x, y) == (to_x, to_y):
             x, y = self.move_to_x, self.move_to_y
             self.board.field[x][y].sprite.rect.center = self.board.get_coords(x, y)
@@ -204,8 +202,20 @@ class Game:
             self.x = self.y = -1
             self.move_x = self.move_y = self.move_to_x = self.move_to_y = -1
             self.move_fl = False
+            self.recount()
             return
         self.board.field[self.move_to_x][self.move_to_y].sprite.rect.center = x, y
+
+    def recount(self):
+        cnt_w, cnt_b = 0, 0
+        for i in self.board.field:
+            for j in i:
+                if j is not None:
+                    if j.get_color() == WHITE:
+                        cnt_w += j.score()
+                    else:
+                        cnt_b += j.score()
+        self.scores = [38 - cnt_w, 38 - cnt_b]
 
     def print_text(self, text, x, y, size, color):
         self.text = text
@@ -263,10 +273,10 @@ class Game:
         self.print_text(now_color, 800, 150, 40, 'red')
 
         self.print_text('Очки', 690, 375, 45, 'red')
-        self.print_text(self.name_b, 550, 425, 40, self.player_b_color)
-        self.print_text(self.name_w, 830, 425, 40, self.player_w_color)
-        self.print_text(str(self.scores[0]), 575, 475, 40, self.player_b_color)
-        self.print_text(str(self.scores[1]), 855, 475, 40, self.player_w_color)
+        self.print_text(self.name_w, 550, 425, 40, self.player_w_color)
+        self.print_text(self.name_b, 830, 425, 40, self.player_b_color)
+        self.print_text(str(self.scores[1]), 575, 475, 40, self.player_w_color)
+        self.print_text(str(self.scores[0]), 855, 475, 40, self.player_b_color)
 
     def draw_chooze_fig(self):
         top, left = 630, 300
@@ -306,8 +316,6 @@ class Game:
                 if to_x != st_x and to_y != st_y:
                     kf = abs((to_x - st_x) / (to_y - st_y))
                     kf1 = abs((to_y - st_y) / (to_x - st_x))
-                    # x * x + x * x * kf * kf = self.v * self.v
-                    # x * x * (kf * kf + 1) = self.v * self.v
                     v_y = ((self.v * self.v) / (kf * kf + 1)) ** 0.5
                     v_x = ((self.v * self.v) / (kf1 * kf1 + 1)) ** 0.5
                 elif to_x == st_x:
@@ -332,7 +340,6 @@ class Game:
                 self.x = self.y = -1
         else:
             self.x = self.y = -1
-        # self.board.print_board()
 
     def get_click(self, mouse_pos):
         if self.chooze_fig_fl:

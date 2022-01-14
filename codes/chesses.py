@@ -31,9 +31,6 @@ class Board:
             Rook(BLACK), Knight(BLACK), Bishop(BLACK), Queen(BLACK),
             King(BLACK), Bishop(BLACK), Knight(BLACK), Rook(BLACK)
         ]
-        # self.field[7][4] = King(BLACK)
-        # self.field[0][4] = King(WHITE)
-        # self.field[0][7] = Rook(WHITE)
 
     def get_coords(self, x, y):
         return (self.left + int(self.cell_size * (y + 0.5)), self.left + int(
@@ -120,19 +117,6 @@ class Board:
         else:
             return WHITE
 
-    def print_board(self):  # Распечатать доску в текстовом виде (см. скриншот)
-        print('     +----+----+----+----+----+----+----+----+')
-        for row in range(7, -1, -1):
-            print(' ', row, end='  ')
-            for col in range(8):
-                print('|', self.cell(row, col), end=' ')
-            print('|')
-            print('     +----+----+----+----+----+----+----+----+')
-        print(end='        ')
-        for col in range(8):
-            print(col, end='    ')
-        print()
-
 
 class Rook:
     def __init__(self, color):
@@ -141,6 +125,9 @@ class Rook:
 
     def get_color(self):
         return self.color
+
+    def score(self):
+        return 5
 
     def char(self):
         return 'R'
@@ -173,6 +160,9 @@ class Pawn:
 
     def get_color(self):
         return self.color
+
+    def score(self):
+        return 1
 
     def char(self):
         return 'P'
@@ -223,6 +213,9 @@ class Knight:
     def get_color(self):
         return self.color
 
+    def score(self):
+        return 3
+
     def char(self):
         return 'N'
 
@@ -240,6 +233,9 @@ class King:
 
     def get_color(self):
         return self.color
+
+    def score(self):
+        return 0
 
     def char(self):
         return 'K'
@@ -331,6 +327,9 @@ class Queen:
     def get_color(self):
         return self.color
 
+    def score(self):
+        return 8
+
     def char(self):
         return 'Q'
 
@@ -393,6 +392,9 @@ class Bishop:
 
     def get_color(self):
         return self.color
+
+    def score(self):
+        return 3
 
     def char(self):
         return 'B'
