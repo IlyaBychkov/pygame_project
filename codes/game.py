@@ -91,7 +91,7 @@ class Game:
 
         self.buttons = pygame.sprite.Group()
         Button('Назад', 20, 20, self.buttons)
-        Button('Сдаться', 665, 230, self.buttons)
+        Button('Сдаться', 790, 530, self.buttons)
 
         self.main()
 
