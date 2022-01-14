@@ -270,7 +270,7 @@ class Game:
             now_color = 'Белый'
             player_color = self.player_w_color
         self.print_text(now_player, 800, 100, 40, player_color)
-        self.print_text(now_color, 800, 150, 40, 'red')
+        self.print_text(now_color, 800, 150, 40, 'white' if self.board.color == WHITE else 'grey')
 
         self.print_text('Очки', 690, 375, 45, 'red')
         self.print_text(self.name_w, 550, 425, 40, self.player_w_color)

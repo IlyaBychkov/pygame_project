@@ -9,7 +9,7 @@ from main import load_image, fps, terminate, Button
 class InputName(pygame.sprite.Sprite):
     def __init__(self, text, x, y, *groups):
         super().__init__(*groups)
-        self.colors = [(0, 255, 0), (255, 0, 0)]
+        self.colors = [(255, 255, 255), (0, 0, 255)]
         self.active = False
         self.text = text
         self.num = text[-1]
