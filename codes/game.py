@@ -1,10 +1,11 @@
+from random import shuffle, randint
+
 import pygame
 
 import finish
 import menu
 from chesses import *
 from main import fps, load_image, terminate, Button
-from random import shuffle, randint
 
 
 class Game:
@@ -227,13 +228,18 @@ class Game:
                 x = 7 - i
                 y = j
                 r, g, b = colors[(i + j) % 2]
-                if self.x != -1 and (x == self.x and y == self.y) or self.board.move_piece(self.x, self.y, x, y, 0) \
+                if self.x != -1 and (x == self.x and y == self.y) or self.board.move_piece(self.x,
+                                                                                           self.y,
+                                                                                           x, y, 0) \
                         and not self.board.field[x][y]:
                     if (i + j) % 2:
                         r, g, b = colors[5]
                     else:
                         r, g, b = colors[4]
-                elif self.x != -1 and (x != self.x or y != self.y) and self.board.move_piece(self.x, self.y, x, y, 0) \
+                elif self.x != -1 and (x != self.x or y != self.y) and self.board.move_piece(self.x,
+                                                                                             self.y,
+                                                                                             x, y,
+                                                                                             0) \
                         and self.board.field[x][y] and \
                         self.board.field[x][y].color != self.board.field[self.x][self.y].color:
                     if (i + j) % 2:
@@ -384,4 +390,4 @@ class Game:
                 winner = self.name_b
             else:
                 winner = self.name_w
-        finish_window = finish.Finish(self.screen, self.clock, winner)
+        finish_window = finish.Finish(self.screen, self.clock, winner, self.name_w, self.name_b)
