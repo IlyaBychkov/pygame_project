@@ -1,3 +1,5 @@
+from sqlite3 import connect
+
 import pygame
 
 import menu
@@ -5,7 +7,7 @@ from main import fps, terminate, load_image
 
 
 class Finish:
-    def __init__(self, screen, clock, winner):
+    def __init__(self, screen, clock, winner, name_w, name_b):
         self.screen = screen
         self.size = self.width, self.height = screen.get_width(), screen.get_height()
         self.clock = clock
@@ -17,7 +19,36 @@ class Finish:
         self.all_sprites = pygame.sprite.Group()
         self.buttons = pygame.sprite.Group()
 
+        self.db_update(name_w, name_b)
         self.main()
+
+    def db_update(self, name_w, name_b):
+        con = connect('../score_table.db')
+        cur = con.cursor()
+
+        res = list(map(lambda x: x[0], cur.execute("""SELECT name FROM Rating""").fetchall()))
+        for name in (name_w, name_b):
+            if name_w not in res:
+                query = """INSERT INTO Rating (name, all_games, white_win, black_win, winrate) 
+                VALUES (?, ?, ?, ?, ?)"""
+                cur.execute(query, (name, 0, 0, 0, 0)).fetchall()
+
+        if self.winner == name_w:
+            query = """UPDATE rating SET white_win = white_win + 1 WHERE name = ?"""
+        elif self.winner == name_b:
+            query = """UPDATE rating SET black_win = black_win + 1 WHERE name = ?"""
+        if self.winner != 'Ничья':
+            cur.execute(query, (self.winner,))
+
+        for name in (name_w, name_b):
+            query = """SELECT all_games, white_win, black_win FROM Rating WHERE name = ?"""
+            games, white, black = cur.execute(query, (name,)).fetchall()[0]
+
+            query = """UPDATE rating SET all_games = ?, winrate = ? WHERE name = ?"""
+            cur.execute(query, (games + 1, round((white + black) / (games + 1) * 100, 2),
+                                name)).fetchall()
+
+        con.commit()
 
     def write(self):
         if self.winner == 'Ничья':
