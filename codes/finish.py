@@ -54,7 +54,7 @@ class Finish:
         if self.winner == 'Ничья':
             text = self.winner
         else:
-            text = f"Победил {self.winner}"
+            text = f"Победил(а) {self.winner}"
         intro_text = [text, 'Нажмите любую кнопку']
         font = pygame.font.Font(None, 30)
         text_coord = self.height // 2 - 40
