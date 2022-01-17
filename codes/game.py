@@ -8,7 +8,7 @@ from chesses import *
 from main import fps, load_image, terminate, Button
 
 
-class Game:
+class Game:  # класс игры
     def __init__(self, screen, clock, name_w, name_b, flag=False):
         self.board = Board(8, 8, 100, 100, 50, 3)
         if flag:
@@ -96,7 +96,7 @@ class Game:
 
         self.main()
 
-    def gen(self):
+    def gen(self):  # генерация поля для шахматы 960
         a = [0, 1, 2, 3, 4, 5, 6, 7]
         shuffle(a)
         x, y, z = sorted(a[:3])
@@ -136,7 +136,7 @@ class Game:
         self.board.field[0][z] = Queen(WHITE)
         self.board.field[7][z] = Queen(BLACK)
 
-    def main(self):
+    def main(self):  # игровой цикл
         next_window = None
         running = True
         while running:
@@ -163,7 +163,7 @@ class Game:
         elif next_window == 'Сдаться':
             self.finish(3)
 
-    def move_fig(self):
+    def move_fig(self):  # передвижение фигуры (анимация)
         x, y = self.board.field[self.move_to_x][self.move_to_y].sprite.rect.center
         to_x, to_y = self.board.get_coords(self.move_to_x, self.move_to_y)
         if x > to_x:
@@ -207,7 +207,7 @@ class Game:
             return
         self.board.field[self.move_to_x][self.move_to_y].sprite.rect.center = x, y
 
-    def recount(self):
+    def recount(self):  # переподсчет очков игроков
         cnt_w, cnt_b = 0, 0
         for i in self.board.field:
             for j in i:
@@ -218,14 +218,14 @@ class Game:
                         cnt_b += j.score()
         self.scores = [38 - cnt_w, 38 - cnt_b]
 
-    def print_text(self, text, x, y, size, color):
+    def print_text(self, text, x, y, size, color):  # вывод текста на экран
         self.text = text
         self.font = pygame.font.Font(None, size)
         self.text_r = self.font.render(self.text, True, pygame.Color(color))
         self.rect = pygame.rect.Rect(*[x, y, self.text_r.get_width(), self.text_r.get_height()])
         self.screen.blit(self.text_r, (self.rect.x, self.rect.y))
 
-    def render(self):
+    def render(self):  # оторисовка поля
         pygame.draw.rect(self.screen, 'white',
                          [self.board.left - self.board.width_frame,
                           self.board.top - self.board.width_frame,
@@ -284,7 +284,7 @@ class Game:
         self.print_text(str(self.scores[1]), 575, 475, 40, self.player_w_color)
         self.print_text(str(self.scores[0]), 855, 475, 40, self.player_b_color)
 
-    def draw_chooze_fig(self):
+    def draw_chooze_fig(self):  # отрисовка выбора фигуры (пешки)
         top, left = 630, 300
         pygame.draw.rect(self.screen, (181, 131, 99),
                          [top - self.board.width_frame,
@@ -298,14 +298,14 @@ class Game:
         else:
             self.chooze_black_sprites.draw(self.screen)
 
-    def get_cell(self, mouse_pos):
+    def get_cell(self, mouse_pos):  # узнать клетку на поле
         cell_x = (mouse_pos[0] - self.board.left) // self.board.cell_size
         cell_y = (mouse_pos[1] - self.board.top) // self.board.cell_size
         if cell_x < 0 or cell_x >= self.board.width or cell_y < 0 or cell_y >= self.board.height:
             return None
         return cell_x, 7 - cell_y
 
-    def on_click(self, cell):
+    def on_click(self, cell):  # действие на клики игрока
         if self.chooze_fig_fl or self.move_fl:
             return
         y, x = cell
@@ -347,7 +347,7 @@ class Game:
         else:
             self.x = self.y = -1
 
-    def get_click(self, mouse_pos):
+    def get_click(self, mouse_pos):  # обработать клик
         if self.chooze_fig_fl:
             cell_x = (mouse_pos[0] - 630) // self.board.cell_size
             cell_y = (mouse_pos[1] - 300) // self.board.cell_size
@@ -380,10 +380,10 @@ class Game:
         if cell:
             self.on_click(cell)
 
-    def back(self):
+    def back(self):  # возврат в меню
         menu_window = menu.Menu(self.screen, self.clock)
 
-    def finish(self, fl):  # 1 - мат, 2 - пат, 3 - сдался
+    def finish(self, fl):  # переход на финальное окно
         winner = None
         if fl == 3:
             if self.board.color == BLACK:
