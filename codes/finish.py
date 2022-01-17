@@ -28,7 +28,7 @@ class Finish:
 
         res = list(map(lambda x: x[0], cur.execute("""SELECT name FROM Rating""").fetchall()))
         for name in (name_w, name_b):
-            if name_w not in res:
+            if name not in res:
                 query = """INSERT INTO Rating (name, all_games, white_win, black_win, winrate) 
                 VALUES (?, ?, ?, ?, ?)"""
                 cur.execute(query, (name, 0, 0, 0, 0)).fetchall()
@@ -54,7 +54,7 @@ class Finish:
         if self.winner == 'Ничья':
             text = self.winner
         else:
-            text = f"Победил {self.winner}"
+            text = f"Победил(а) {self.winner}"
         intro_text = [text, 'Нажмите любую кнопку']
         font = pygame.font.Font(None, 30)
         text_coord = self.height // 2 - 40
