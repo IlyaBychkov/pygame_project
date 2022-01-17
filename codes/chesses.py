@@ -2,7 +2,7 @@ WHITE = 1
 BLACK = 2
 
 
-class Board:
+class Board:  # общий класс для шахмат. Поле и их расположение
     def __init__(self, width=8, height=8, left=10, top=10, cell_size=10, width_frame=2):
         self.NUM = 0
         self.width = width
@@ -32,11 +32,11 @@ class Board:
             King(BLACK), Bishop(BLACK), Knight(BLACK), Rook(BLACK)
         ]
 
-    def get_coords(self, x, y):
+    def get_coords(self, x, y):  # получить координаты на клетки на экране
         return (self.left + int(self.cell_size * (y + 0.5)), self.left + int(
             self.cell_size * (7 - x + 0.5)))
 
-    def is_under_attack(self, row, col, color):
+    def is_under_attack(self, row, col, color):  # проверить, под атакой ли клетка
         for i in range(8):
             for j in range(8):
                 if (self.field[i][j] is not None and
@@ -46,7 +46,7 @@ class Board:
                     return True
         return False
 
-    def cell(self, row, col):
+    def cell(self, row, col):  # получить фигуру на клетке (текстовый формат)
         piece = self.field[row][col]
         if piece is None:
             return '  '
@@ -54,10 +54,10 @@ class Board:
         c = 'w' if color == WHITE else 'b'
         return c + piece.char()
 
-    def get_piece(self, row, col):
+    def get_piece(self, row, col):  # получить фигуру на клетке
         return self.field[row][col]
 
-    def move_piece(self, row, col, row1, col1, fl=1):
+    def move_piece(self, row, col, row1, col1, fl=1):  # передвинуть фигуру или узнать что ход невозможен
         pred = [[j for j in i] for i in self.field]
         if row == row1 and col == col1:
             return False
@@ -92,7 +92,7 @@ class Board:
             self.field = pred[:]
         return True
 
-    def check_mat(self):
+    def check_mat(self):  # проверка мата/пата
         x, y = -1, -1
         now = [[j for j in i] for i in self.field]
         for i in range(8):
@@ -111,28 +111,28 @@ class Board:
             return 1
         return 2
 
-    def opponent(self, color):
+    def opponent(self, color):  # получить цвет оппонента
         if color == WHITE:
             return BLACK
         else:
             return WHITE
 
 
-class Rook:
+class Rook:  # Класс Ладьи
     def __init__(self, color):
         self.color = color
         self.flag = 1
 
-    def get_color(self):
+    def get_color(self):  # узнать цвет фигуры
         return self.color
 
-    def score(self):
+    def score(self):  # узнать цену фигуры
         return 5
 
-    def char(self):
+    def char(self):  # узнать текстовый вид фигуры
         return 'R'
 
-    def can_move(self, board, row, col, row1, col1, fl=1):
+    def can_move(self, board, row, col, row1, col1, fl=1):  # может ли походить фигура в эту клетку
         if row != row1 and col != col1:
             return False
 
@@ -149,25 +149,25 @@ class Rook:
             self.flag = 0
         return True
 
-    def can_attack(self, board, row, col, row1, col1, fl=1):
+    def can_attack(self, board, row, col, row1, col1, fl=1):  # может ли побить фигура эту клетку
         return self.can_move(board, row, col, row1, col1, fl)
 
 
-class Pawn:
+class Pawn:  # класс пешки
     def __init__(self, color):
         self.color = color
         self.flag = 0
 
-    def get_color(self):
+    def get_color(self):  # узнать цвет фигуры
         return self.color
 
-    def score(self):
+    def score(self):  # узнать цену фигуры
         return 1
 
-    def char(self):
+    def char(self):  # узнать текстовый вид фигуры
         return 'P'
 
-    def can_move(self, board, row, col, row1, col1, fl=1):
+    def can_move(self, board, row, col, row1, col1, fl=1):  # может ли походить фигура в эту клетку
         if col != col1:
             direction = 1 if (self.color == WHITE) else -1
             if (self.can_attack(board, row, col, row1, col1, fl) and
@@ -198,7 +198,7 @@ class Pawn:
 
         return False
 
-    def can_attack(self, board, row, col, row1, col1, fl=1):
+    def can_attack(self, board, row, col, row1, col1, fl=1):  # может ли побить фигура эту клетку
         direction = 1 if (self.color == WHITE) else -1
         if (row + direction == row1
                 and (col + 1 == col1 or col - 1 == col1)):
@@ -206,41 +206,41 @@ class Pawn:
         return False
 
 
-class Knight:
+class Knight:  # класс Коня
     def __init__(self, color):
         self.color = color
 
-    def get_color(self):
+    def get_color(self):  # узнать цвет фигуры
         return self.color
 
-    def score(self):
+    def score(self):  # узнать цену фигуры
         return 3
 
-    def char(self):
+    def char(self):  # узнать текстовый вид фигуры
         return 'N'
 
-    def can_move(self, board, row, col, row1, col1, fl=1):
+    def can_move(self, board, row, col, row1, col1, fl=1):  # может ли походить фигура в эту клетку
         return abs(row - row1) * abs(col - col1) == 2
 
-    def can_attack(self, board, row, col, row1, col1, fl=1):
+    def can_attack(self, board, row, col, row1, col1, fl=1):  # может ли побить фигура эту клетку
         return self.can_move(board, row, col, row1, col1, fl)
 
 
-class King:
+class King:  # класс Короля
     def __init__(self, color):
         self.color = color
         self.flag = 1
 
-    def get_color(self):
+    def get_color(self):  # узнать цвет фигуры
         return self.color
 
-    def score(self):
+    def score(self):  # узнать цену фигуры
         return 0
 
-    def char(self):
+    def char(self):  # узнать текстовый вид фигуры
         return 'K'
 
-    def can_move(self, board, row, col, row1, col1, fl=1):
+    def can_move(self, board, row, col, row1, col1, fl=1):  # может ли походить фигура в эту клетку
         if (abs(row - row1) <= 1 and abs(col - col1) <= 1 and
                 not board.is_under_attack(row1, col1, self.color)):
             if fl:
@@ -316,24 +316,24 @@ class King:
             return True
         return False
 
-    def can_attack(self, board, row, col, row1, col1, fl=1):
+    def can_attack(self, board, row, col, row1, col1, fl=1):  # может ли побить фигура эту клетку
         return self.can_move(board, row, col, row1, col1, fl)
 
 
-class Queen:
+class Queen:  # класс Ферзя
     def __init__(self, color):
         self.color = color
 
-    def get_color(self):
+    def get_color(self):  # узнать цвет фигуры
         return self.color
 
-    def score(self):
+    def score(self):  # узнать цену фигуры
         return 8
 
-    def char(self):
+    def char(self):  # узнать текстовый вид фигуры
         return 'Q'
 
-    def can_move(self, board, row, col, row1, col1, fl=1):
+    def can_move(self, board, row, col, row1, col1, fl=1):  # может ли походить фигура в эту клетку
         i, j = row + 1, col + 1
         while i < 8 and j < 8:
             if i == row1 and j == col1:
@@ -382,24 +382,24 @@ class Queen:
 
         return True
 
-    def can_attack(self, board, row, col, row1, col1, fl=1):
+    def can_attack(self, board, row, col, row1, col1, fl=1):  # может ли побить фигура эту клетку
         return self.can_move(board, row, col, row1, col1, fl)
 
 
-class Bishop:
+class Bishop:  # класс Слона
     def __init__(self, color):
         self.color = color
 
-    def get_color(self):
+    def get_color(self):  # узнать цвет фигуры
         return self.color
 
-    def score(self):
+    def score(self):  # узнать цену фигуры
         return 3
 
-    def char(self):
+    def char(self):  # узнать текстовый вид фигуры
         return 'B'
 
-    def can_move(self, board, row, col, row1, col1, fl=1):
+    def can_move(self, board, row, col, row1, col1, fl=1):  # может ли походить фигура в эту клетку
         i, j = row + 1, col + 1
         while i < 8 and j < 8:
             if i == row1 and j == col1:
@@ -434,5 +434,5 @@ class Bishop:
                 break
         return False
 
-    def can_attack(self, board, row, col, row1, col1, fl=1):
+    def can_attack(self, board, row, col, row1, col1, fl=1):  # может ли побить фигура эту клетку
         return self.can_move(board, row, col, row1, col1, fl)
