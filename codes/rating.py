@@ -24,12 +24,12 @@ class Rating:
         self.font = pygame.font.Font(None, 40)
         self.main()
 
-    def print_text(self, text, x, y):
+    def print_text(self, text, x, y):  # удобная функция для вывода текста
         render = self.font.render(text, True, (255, 255, 255))
         self.rect = pygame.Rect(x, y, render.get_width(), render.get_height())
         self.screen.blit(render, self.rect)
 
-    def print_board(self):
+    def print_board(self):  # вывод таблицы
         x, y = 80, 100
         step_x, step_y = 200, 70
         res = list(self.cur.execute("""select * from rating order by -winrate""").fetchall())
@@ -71,5 +71,5 @@ class Rating:
         else:
             terminate()
 
-    def back(self):
+    def back(self):  # переход в меню
         menu_window = menu.Menu(self.screen, self.clock)

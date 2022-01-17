@@ -16,7 +16,7 @@ class Chess:
 
         self.main()
 
-    def write(self):
+    def write(self):  # вывод текста
         intro_text = ["Нажмите любую кнопку, чтобы начать"]
         font = pygame.font.Font(None, 30)
         text_coord = self.height // 2 - 15
