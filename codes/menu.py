@@ -6,7 +6,7 @@ import game
 from main import load_image, fps, terminate, Button
 
 
-class InputName(pygame.sprite.Sprite):
+class InputName(pygame.sprite.Sprite):  # объект для ввода имени
     def __init__(self, text, x, y, *groups):
         super().__init__(*groups)
         self.colors = [(255, 255, 255), (0, 0, 255)]
@@ -37,7 +37,7 @@ class InputName(pygame.sprite.Sprite):
         return self.check_click(mouse_pos)
 
 
-class RadioButton(Button):
+class RadioButton(Button):  # объекты для выбора режима игры
     def __init__(self, text, x, y, active, *groups):
         super().__init__(text, x, y, *groups)
         self.active = active
@@ -129,7 +129,7 @@ class Menu:
         else:
             terminate()
 
-    def start_game(self, var):
+    def start_game(self, var):  # переход в игровое окно
         names = []
         for obj in self.names:
             names.append(obj.text)
@@ -138,8 +138,8 @@ class Menu:
         elif var == 'Шахматы-960':
             game_window = game.Game(self.screen, self.clock, *names, flag=True)
 
-    def rating(self):
+    def rating(self):  # переход в рейтинговое окно
         rating_window = rating.Rating(self.screen, self.clock)
 
-    def back(self):
+    def back(self):  # переход в стартовое окно
         start_window = start.Chess(self.screen, self.clock)

@@ -13,7 +13,7 @@ def terminate():
     sys.exit()
 
 
-def load_image(name, colorkey=None):
+def load_image(name, colorkey=None):  # загрузка изображения в pygame
     fullname = os.path.join('../img', name)
     if not os.path.isfile(fullname):
         print(f"Файл с изображением '{fullname}' не найден")
@@ -27,7 +27,7 @@ def load_image(name, colorkey=None):
     return image
 
 
-class Button(pygame.sprite.Sprite):
+class Button(pygame.sprite.Sprite):  # класс кнопки
     def __init__(self, text, x, y, *groups):
         super().__init__(*groups)
         self.text = text

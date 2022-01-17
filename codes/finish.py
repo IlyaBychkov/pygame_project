@@ -22,7 +22,7 @@ class Finish:
         self.db_update(name_w, name_b)
         self.main()
 
-    def db_update(self, name_w, name_b):
+    def db_update(self, name_w, name_b):  # обновление базы данных
         con = connect('../score_table.db')
         cur = con.cursor()
 
@@ -50,7 +50,7 @@ class Finish:
 
         con.commit()
 
-    def write(self):
+    def write(self):  # вывод текста
         if self.winner == 'Ничья':
             text = self.winner
         else:
@@ -82,5 +82,5 @@ class Finish:
             self.clock.tick(fps)
         self.back()
 
-    def back(self):
+    def back(self):  # переход в меню
         start_window = menu.Menu(self.screen, self.clock)
